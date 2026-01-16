@@ -20,7 +20,9 @@ android {
 
         buildConfigField "String[]", "ICON_PACKS", "{\"classic\",\"material\"}"
         manifestPlaceholders = [ googleAndroidBackupAPIKey:"unused" ]
-
+        ndk {
+            abiFilters.add("arm64-v8a")
+        }
         kapt {
             arguments {
                 arg("room.incremental", "true")
@@ -29,8 +31,17 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("SIGN_STORE_FILE") ?: "default-path/keystore.jks")
+            storePassword = System.getenv("SIGN_STORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("SIGN_KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("SIGN_KEY_PASSWORD") ?: ""
+        }
+        }
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             minifyEnabled = false
         }
     }
